@@ -1,0 +1,92 @@
+
+<head>
+    <title>Run Python Anywhere</title>
+          <script src="https://cdn.jsdelivr.net/pyodide/v0.19.0/full/pyodide.js"></script>
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/codemirror.min.css">
+          <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/addon/edit/matchbrackets.js"></script> -->
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/theme/3024-night.css">
+          <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.1/themes/prism-solarizedlight.min.css">
+          <link rel="stylesheet" type="text/css" href="https://antimatter15.com/style/temp/test.css">
+          <link rel="stylesheet" type="text/css" href="https://omrelli.ug/g9/main.css">
+          <link rel="stylesheet" type="text/css" href="https://omrelli.ug/g9/gallery/gallery.css">
+<style>
+  .content {display: flex; flex-direction: column;}
+  .input {flex: 1; width: 100%}
+</style>
+</head>
+<body class='language-py'>
+  <div class="page">
+    <div class='header'>
+      <a href="../"><div class='splash'>
+          .py
+      </div></a>
+        <div class='tagline'>run Python anywhere</div>
+    </div>
+  </div>
+  <script>
+    var pyodide
+    async function main(){
+        pyodide = await loadPyodide({
+          indexURL : "https://cdn.jsdelivr.net/pyodide/v0.19.0/full/"
+        });
+        await pyodide.loadPackage("micropip");
+
+        await pyodide.runPythonAsync(`
+         import micropip
+         `)
+        return pyodide;
+    }
+    let pyodideReadyPromise = main();
+    </script>
+
+  <div class='page'>
+    <p>Open the JavaScript console to see the results of print statements and error messages.</p>
+  </div>
+  <div class='content'>
+    <div class='input'>
+      <div class='run-button'>Run</div>
+        <textarea class='user'>print("hello, world!")
+
+"the final expression is returned below"</textarea>
+    </div>
+    <pre class='output' style="background-color: #000; color: #FFF"></pre>
+  </div>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.1/prism.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/keymap/sublime.min.js"></script>
+
+
+<script>
+  var isMac = window.navigator.platform.indexOf('Mac') !== -1;
+
+  const input = document.querySelector('.input');
+  const output = document.querySelector('.output');
+
+  var cm = CodeMirror.fromTextArea(input.querySelector('textarea'), {
+       theme: '3024-night',
+       indentUnit: 2,
+       keyMap: 'sublime',
+       lineWrapping: true
+  })
+
+  async function run() {
+      let pyodide = await pyodideReadyPromise;
+      const result = pyodide.runPython(cm.getValue());
+      output.innerHTML = result.toString();
+  }
+
+  cm.setOption('extraKeys', {
+      "Cmd-Enter": run,
+      "Ctrl-Enter": run
+  })
+
+  run();
+
+  var runButton = input.querySelector('.run-button')
+  runButton.addEventListener('click', run)
+  runButton.innerHTML += isMac ? ' (Cmd-Enter)' : '(Ctrl-Enter)'
+</script>
+
+</body>
